@@ -1,0 +1,6 @@
+pandas
+scikit-learn
+jupyter
+binance-connector
+mlflow
+evidently

@@ -1,0 +1,12 @@
+{
+  "name": "MLOps-Binance-Environment",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "eamodio.gitlens"
+      ]
+    }
+  }
+}

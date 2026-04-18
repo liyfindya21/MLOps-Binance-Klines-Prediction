@@ -116,8 +116,82 @@ Proyek ini menerapkan **GitHub Flow** untuk pengelolaan kode yang aman:
 * **⚖️ Pull Request (PR)**: Setiap perubahan harus melewati proses PR dan divalidasi sebelum di-merge ke branch utama.
 
 ---
+## 📚6. Manajemen Versi Data (DVC - LK-05)
+Proyek ini menggunakan Data Version Control (DVC) untuk mengelola dataset besar tanpa membebani repositori Git. DVC memungkinkan pelacakan perubahan data dengan cara yang mirip dengan cara Git melacak kode sumber.
 
-## 👤 6. Identitas Pengembang
+### ⚙️ A. Persiapan dan Inisialisasi
+Langkah pertama adalah menyiapkan lingkungan dan menginisialisasi DVC di dalam repositori:
+```bash
+# Membuat branch baru untuk pengerjaan DVC
+git checkout -b feat/dvc-data-management 
+
+# Instalasi DVC
+pip install dvc 
+
+# Inisialisasi DVC dalam proyek
+dvc init 
+
+# Commit konfigurasi awal DVC ke Git
+git add .dvc .gitignore .dvcignore 
+git commit -m "Initialize DVC for data versioning" 
+```
+---
+
+### 📥 B. Pelacakan Dataset (Tracking)
+DVC mengambil alih pengelolaan folder data dari Git agar repositori tetap ringan:
+```bash
+# Melepaskan folder data dari pantauan Git (tanpa menghapus file fisik)
+git rm -r --cached data/raw data/processed 
+git commit -m "Stop tracking data folders in Git to move them to DVC" 
+
+# Mulai melacak folder data menggunakan DVC
+dvc add data/raw data/processed 
+
+# Menambahkan file pointer (.dvc) ke Git
+git add data/raw.dvc data/processed.dvc data/.gitignore 
+git commit -m "Track initial raw and processed datasets with DVC" 
+```
+---
+
+### 🔄 C. Simulasi Pembaruan Data (Continual Learning)
+Saat ada data baru dari hasil ingest atau prapemrosesan, DVC digunakan untuk mencatat versi terbaru tersebut:
+```bash
+# Jalankan pipeline data (LK-04) untuk mendapat data baru
+python src/ingest_data.py 
+python src/preprocess.py 
+
+# Update pelacakan DVC untuk mencatat hash data terbaru
+dvc add data/raw data/processed 
+
+# Lihat perbedaan hash metadata
+dvc status 
+dvc diff
+
+# Commit perubahan metadata (.dvc) ke Git
+git add data/raw.dvc data/processed.dvc 
+git commit -m "Update datasets with new kline batches (Continual Learning simulation)" 
+```
+---
+
+### ☁️ D. Setup Remote Storage & Push
+Data asli (fisik) disimpan di Remote Storage (dalam simulasi ini menggunakan folder lokal di luar repo):
+```bash
+# Membuat folder storage lokal sebagai simulasi remote
+mkdir -p /tmp/dvc_remote
+
+# Mendaftarkan storage tersebut sebagai remote default DVC
+dvc remote add -d local_remote /tmp/dvc_remote 
+
+# Simpan konfigurasi remote ke Git
+git add .dvc/config 
+git commit -m "Configure local DVC remote storage" 
+
+# Upload (Push) data asli ke remote storage
+dvc push 
+```
+---
+
+## 👤 7. Identitas Pengembang
 * 🏷️ **Nama:** Aurelia Salsabilla Yunanto P.
 * 🆔 **NIM:** 235150201111075
 * 📚 **Mata Kuliah:** Machine Learning Operations (CIF60048)

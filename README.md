@@ -924,7 +924,6 @@ git push origin feat/model-registry-versioning
 ```
 ---
 
-Buat file src/verify_inference.py:
 ## 👤 9. Identitas Pengembang
 * 🏷️ **Nama:** Aurelia Salsabilla Yunanto P.
 * 🆔 **NIM:** 235150201111075

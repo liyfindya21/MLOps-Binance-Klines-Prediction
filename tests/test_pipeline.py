@@ -14,3 +14,4 @@ def test_data_structure():
     assert not df.empty, "Dataframe tidak boleh kosong"
     assert 'close' in df.columns, "Kolom close wajib ada untuk target prediksi"
     assert 'volume' in df.columns, "Kolom volume wajib ada untuk indikator pasar"
+    # test re-push

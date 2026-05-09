@@ -1,0 +1,44 @@
+name: MLOps Automation Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - feat/mlops-automation
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-train-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Tahap 1 - Automated Testing (Unit Test)
+        run: |
+          pytest tests/
+
+      - name: Tahap 2 & 3 - Data Pipeline & Automated Training
+        run: |
+          # Menarik data terbaru untuk simulasi
+          python src/ingest_data.py
+          python src/preprocess.py
+          # Menjalankan script dari LK-06
+          python src/train.py
+
+      - name: Tahap 4 & 5 - Model Evaluation & Auto-Registry
+        run: |
+          python src/auto_eval_registry.py

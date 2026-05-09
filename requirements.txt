@@ -3,4 +3,9 @@ scikit-learn
 jupyter
 binance-connector
 mlflow
-evidently
+evidentlypytest
+pytest
+requests
+mlflow
+pytest
+pandas

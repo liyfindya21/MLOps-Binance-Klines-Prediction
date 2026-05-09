@@ -1,3 +1,4 @@
+# Simulasi LK-08
 import mlflow
 import mlflow.sklearn
 import pandas as pd
@@ -175,11 +176,15 @@ if __name__ == "__main__":
         run_name        = "GB-n100-lr005"
     )
 
+
+    # Simulasi LK-08
     # Run 4 — Gradient Boosting agresif (opsional, nilai lebih)
     run_experiment(
         params    = {"model_type": "gradient_boosting",
-                     "n_estimators": 150,
-                     "learning_rate": 0.1, "max_depth": 5},
+                     ##"n_estimators": 150,
+                     "n_estimators": 160,
+                     "learning_rate": 0.1, ##"max_depth": 5},
+                     "max_depth": 6},
         experiment_name = EXP,
         run_name        = "GB-n150-lr01"
     )

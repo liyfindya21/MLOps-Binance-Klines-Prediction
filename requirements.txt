@@ -3,4 +3,5 @@ scikit-learn
 mlflow
 python-binance
 requests
+evidently
 pytest

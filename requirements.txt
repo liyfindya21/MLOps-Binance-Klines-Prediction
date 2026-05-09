@@ -1,11 +1,6 @@
 pandas
 scikit-learn
-jupyter
-binance-connector
 mlflow
-evidentlypytest
-pytest
+python-binance
 requests
-mlflow
 pytest
-pandas

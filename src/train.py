@@ -148,6 +148,7 @@ def run_experiment(params: dict, experiment_name: str, run_name: str):
 # MAIN — 3 VARIASI RUN
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
+    mlflow.set_tracking_uri("file:./mlflow-runs")
 
     EXP = "BTC-USDT-Price-Direction"
 

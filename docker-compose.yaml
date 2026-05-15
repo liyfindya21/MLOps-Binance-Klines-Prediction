@@ -5,10 +5,11 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./mlruns:/app/mlruns
+      - .:/app  # Menghubungkan seluruh folder project (termasuk mlruns dan mlflow.db) ke /app di kontainer
+    working_dir: /app
     command: >
       mlflow server 
-      --host 0.0.0.0 
+      --host 0.0.0.0 doc
       --port 5000 
       --backend-store-uri sqlite:///mlflow.db 
       --default-artifact-root /app/mlruns

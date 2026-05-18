@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   mlflow-server:
     image: ghcr.io/mlflow/mlflow:latest
@@ -16,29 +18,18 @@ services:
     networks:
       - mlops-network
 
-  api-service:
-    build: .
-    container_name: btc_prediction_api
+  model-serving-api:
+    image: btc-model-api:latest
     ports:
-      - "8000:5001"
-    volumes:
-      - ./mlruns:/app/mlruns  # PENTING: Agar API bisa membaca file model biner (.pkl)
-    working_dir: /app
+      - "8000-8002:8080" # KUNCI: Mengalokasikan port 8000, 8001, dan 8002 secara otomatis untuk tiap replika
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow-server:5000
-      - MLFLOW_TRACKING_INSECURE_TLS=true
-      # PENTING: Kosongkan semua proxy bawaan Codespaces agar komunikasi internal antar-container lancar
-      - HTTP_PROXY=
-      - HTTPS_PROXY=
-      - http_proxy=
-      - https_proxy=
-      - NO_PROXY=mlflow-server,localhost,127.0.0.1
-      - no_proxy=mlflow-server,localhost,127.0.0.1
+    deploy:
+      replicas: 3
     depends_on:
       - mlflow-server
     networks:
       - mlops-network
-
 networks:
   mlops-network:
     driver: bridge

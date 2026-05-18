@@ -157,7 +157,7 @@ if __name__ == "__main__":
     id_path_absolut = os.path.abspath("mlruns/mlflow.db")
     
     # 3. Set tracking URI menggunakan jalur absolut (gunakan 4 garis miring untuk sqlite absolut)
-    mlflow.set_tracking_uri(f"sqlite:////{id_path_absolut}")
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
 
     EXP = "BTC-USDT-Price-Direction"
     # ... (sisa kode run_experiment di bawahnya tetap sama seperti sebelumnya)

@@ -1101,7 +1101,32 @@ Klik proses tersebut, klik job build-test-train-eval, dan buka bagian Tahap 4 & 
 
 Screenshot log tersebut (akan terlihat tulisan "Status: LOLOS EVALUASI...") dan salin URL-nya sebagai Luaran 2.
 --- 
-## 👤 10. Identitas Pengembang
+
+## 📝 Dokumentasi Operasional Layanan [LK-09 & LK-10]
+
+### 🚀 LK-09: Model Serving via Custom Flask API & Docker
+Pada tugas LK-09, model dilayani menggunakan API kustom berbasis Flask (`src/inference_api.py`) yang dibungkus ke dalam kontainer Docker pada port `8000`. Layanan ini mendengarkan request pada endpoint `/predict`.
+
+* **Perintah Pengujian (Metode POST):**
+  ```bash
+  curl -X POST http://localhost:8000/predict \
+       -H "Content-Type: application/json" \
+       -d '[{"rsi_14": 50.0, "macd_diff": 0.5, "bb_width": 0.02, "vol_change": 0.1, "taker_ratio": 0.5}]'
+  ```
+### ⚖️ LK-10: Model Serving & Horizontal Scaling via MLflow Models
+Pada tugas LK-10, metode serving diubah menggunakan server bawaan murni dari MLflow Models (btc-model-api) yang berjalan di atas kluster Docker Compose. Untuk menangani beban kerja tinggi (high workload), diterapkan teknik Horizontal Scaling dengan 3 replika paralel yang berjalan pada rentang port 8000-8002 lewat endpoint bawaan /invocations.
+1. Perintah Pengujian (Metode POST):
+   ```bash
+   curl -X POST http://localhost:8000/invocations \
+     -H "Content-Type: application/json" \
+     -d '{"dataframe_records": [{"rsi_14": 50.0, "macd_diff": 0.5, "bb_width": 0.02, "vol_change": 0.1, "taker_ratio": 0.5}]}'
+   ```
+2. Cara Mengubah Jumlah Replika Secara Dinamis (Scaling Up):
+   Jika trafik atau beban server melonjak secara tiba-tiba, jumlah instansi kontainer API dapat ditingkatkan secara dinamis tanpa memicu downtime dengan mengeksekusi perintah:
+   ```bash
+   docker compose up -d --scale model-serving-api=3
+   
+## 👤 11. Identitas Pengembang
 * 🏷️ **Nama:** Aurelia Salsabilla Yunanto P.
 * 🆔 **NIM:** 235150201111075
 * 📚 **Mata Kuliah:** Machine Learning Operations (CIF60048)

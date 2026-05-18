@@ -148,9 +148,19 @@ def run_experiment(params: dict, experiment_name: str, run_name: str):
 # MAIN — 3 VARIASI RUN
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
-    mlflow.set_tracking_uri("file:./mlflow-runs")
+    # 1. Pastikan folder mlruns dibuat secara otomatis di root
+    if not os.path.exists("mlruns"):
+        os.makedirs("mlruns")
+
+    # 2. Ambil jalur absolut (path lengkap) dari mlflow.db
+    import os
+    id_path_absolut = os.path.abspath("mlruns/mlflow.db")
+    
+    # 3. Set tracking URI menggunakan jalur absolut (gunakan 4 garis miring untuk sqlite absolut)
+    mlflow.set_tracking_uri(f"sqlite:////{id_path_absolut}")
 
     EXP = "BTC-USDT-Price-Direction"
+    # ... (sisa kode run_experiment di bawahnya tetap sama seperti sebelumnya)
 
     # Run 1 — Random Forest kecil
     run_experiment(
@@ -177,18 +187,14 @@ if __name__ == "__main__":
         run_name        = "GB-n100-lr005"
     )
 
-
-    # Simulasi LK-08
     # Run 4 — Gradient Boosting agresif (opsional, nilai lebih)
     run_experiment(
         params    = {"model_type": "gradient_boosting",
-                     ##"n_estimators": 150,
                      "n_estimators": 160,
-                     "learning_rate": 0.1, ##"max_depth": 5},
+                     "learning_rate": 0.1, 
                      "max_depth": 6},
         experiment_name = EXP,
         run_name        = "GB-n150-lr01"
     )
 
-    print("\n✅ Semua eksperimen selesai! Jalankan: mlflow ui")
-
+    print("\n✅ Semua eksperimen selesai! Database SQLite berhasil dibuat di mlruns/mlflow.db")

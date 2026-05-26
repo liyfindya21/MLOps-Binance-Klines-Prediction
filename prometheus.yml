@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 5s # Mengambil data metrik setiap 5 detik sekali
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'mlflow-model-replicas'
+    static_configs:
+      # Mengarah langsung ke service cluster model-serving-api pada port internal 8080
+      - targets: ['model-serving-api:8080']

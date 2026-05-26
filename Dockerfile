@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 7. Beritahu Docker bahwa kontainer ini akan menggunakan port 5001
-EXPOSE 5001
+EXPOSE 8080
 
 # 8. Perintah untuk menjalankan API saat kontainer dinyalakan
 CMD ["python", "src/inference_api.py"]

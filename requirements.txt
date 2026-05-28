@@ -6,3 +6,6 @@ requests
 evidently
 pytest
 flask
+fastapi
+uvicorn
+prometheus-fastapi-instrumentator

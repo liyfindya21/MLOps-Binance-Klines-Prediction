@@ -1,35 +1,37 @@
 version: '3.8'
 
 services:
-  mlflow-server:
-    image: ghcr.io/mlflow/mlflow:latest
-    container_name: mlflow_tracker
+  # LK-10: Layanan Model API MLflow dengan 3 Replika
+  model-service:
+    image: btc-api-image:latest
     ports:
-      - "5000:5000"
-    volumes:
-      - ./mlruns:/app/mlruns
-    working_dir: /app
-    command: >
-      mlflow server 
-      --host 0.0.0.0 
-      --port 5000 
-      --backend-store-uri sqlite:///mlruns/mlflow.db 
-      --default-artifact-root /app/mlruns
+      - "8080" # Memetakan port internal MLflow (8080) ke port lokal (5001)
+    deploy:
+      replicas: 3 # MANDAT MUTAK LK-10: 3 INSTANSI BERJALAN BERSAMAAN
+    environment:
+      - GUNICORN_CMD_ARGS=--timeout 60
     networks:
       - mlops-network
 
-  model-serving-api:
-    image: btc-model-api:latest
+  # LK-11: Kontainer Scraping Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mlops-binance-klines-prediction-prometheus-1
     ports:
-      - "8000-8002:8080" # KUNCI: Mengalokasikan port 8000, 8001, dan 8002 secara otomatis untuk tiap replika
-    environment:
-      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
-    deploy:
-      replicas: 3
-    depends_on:
-      - mlflow-server
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # LK-11: Kontainer Visualisasi Grafana
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
     networks:
       - mlops-network
+
 networks:
   mlops-network:
     driver: bridge

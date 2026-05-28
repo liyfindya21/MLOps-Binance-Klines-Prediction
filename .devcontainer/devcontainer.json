@@ -1,12 +1,19 @@
 {
-  "name": "MLOps-Binance-Environment",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-python.python",
-        "ms-toolsai.jupyter",
-        "eamodio.gitlens"
-      ]
+    "name": "MLOps-Binance-Environment",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "eamodio.gitlens"
+            ]
+        }
+    },
+    "portsAttributes": {
+        "5000": {
+            "label": "MLflow Server",
+            "onAutoForward": "notify",
+            "visibility": "public"
+        }
     }
-  }
 }

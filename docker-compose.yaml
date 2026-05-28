@@ -1,65 +1,34 @@
-
+version: '3.8'
 
 services:
-  mlflow-server:
-    image: ghcr.io/mlflow/mlflow:v2.11.3
-    container_name: mlflow_tracker
+  # LK-10: Layanan Model API MLflow dengan 3 Replika
+  model-service:
+    image: btc-api-image:latest
     ports:
-      - "5000:5000"
-    # Biarkan dia berjalan default tanpa mounting volume database yang bikin locking
-    command: mlflow server --host 0.0.0.0 --port 5000
-    networks:
-      - mlops-network
-
-  model-serving-api:
-    build: .
-    environment:
-      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
-      - NO_PROXY=mlflow-server,localhost,127.0.0.1
-      - no_proxy=mlflow-server,localhost,127.0.0.1
+      - "8080" # Memetakan port internal MLflow (8080) ke port lokal (5001)
     deploy:
-      replicas: 3
-    depends_on:
-      - mlflow-server
+      replicas: 3 # MANDAT MUTAK LK-10: 3 INSTANSI BERJALAN BERSAMAAN
+    environment:
+      - GUNICORN_CMD_ARGS=--timeout 60
     networks:
       - mlops-network
 
-  # TAMBAHKAN SERVICE NGINX DI SINI
-  nginx-load-balancer:
-    image: nginx:latest
-    container_name: nginx_gateway
-    ports:
-      - "8000:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - model-serving-api
-    networks:
-      - mlops-network
-
-  # ... (Service prometheus dan grafana biarkan sama seperti sebelumnya)
-
+  # LK-11: Kontainer Scraping Prometheus
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus_server
+    container_name: mlops-binance-klines-prediction-prometheus-1
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    depends_on:
-      - model-serving-api
-    networks:
-      - mlops-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
+  # LK-11: Kontainer Visualisasi Grafana
   grafana:
     image: grafana/grafana:latest
-    container_name: grafana_dashboard
     ports:
       - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    depends_on:
-      - prometheus
     networks:
       - mlops-network
 

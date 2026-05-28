@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 8080
 
 # 8. Perintah untuk menjalankan API saat kontainer dinyalakan
-CMD ["python", "src/inference_api.py"]
+CMD ["python3", "-m", "uvicorn", "src.inference_api:app", "--host", "0.0.0.0", "--port", "8080"]

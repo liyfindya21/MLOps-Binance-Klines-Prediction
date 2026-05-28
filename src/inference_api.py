@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, HTTPException
 import mlflow.pyfunc
 import pandas as pd
+from prometheus_fastapi_instrumentator import Instrumentator
 import os
 import glob
 import uvicorn
@@ -11,15 +12,17 @@ app = FastAPI(
     description="API untuk inferensi model ML menggunakan MLflow dengan antarmuka Swagger UI",
     version="1.0.0"
 )
+# Aktifkan pelacak metrik otomatis untuk Prometheus
+Instrumentator().instrument(app).expose(app)
 
 # Set tracking URI menggunakan relative path lokal
-mlflow.set_tracking_uri("sqlite:///mlruns/mlflow.db")
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
 
 model = None
 
 try:
     # 1. Coba load lewat registry biasa dulu (Stage Staging)
-    model_uri = "models:/BTC-Direction-Classifier/Staging"
+    model_uri = "models:/BTC-Direction-Classifier/Production"
     print(f"📦 Memuat model dari Registry: {model_uri}...")
     model = mlflow.pyfunc.load_model(model_uri)
     print("✅ SEGAR! Model Staging berhasil dimuat via Registry!")
@@ -33,7 +36,7 @@ except Exception as registry_error:
         mlmodel_files = glob.glob(search_path, recursive=True)
         
         if mlmodel_files:
-            mlmodel_files.sort(key=os.path.getmtime, recursive=True)
+            mlmodel_files.sort(key=os.path.getmtime)
             model_dir = os.path.dirname(mlmodel_files[0])
             model = mlflow.pyfunc.load_model(model_dir)
             print("✅ Model berhasil dimuat dari file lokal kontainer!")
@@ -57,13 +60,14 @@ def health_check():
     return {"status": "healthy", "model_available": model is not None}
 
 @app.post("/predict", tags=["Inference"])
-def predict(data: list):
+def predict(data: list[list[float]]):
     if model is None:
         raise HTTPException(status_code=500, detail="Model tidak tersedia di server atau gagal dimuat.")
         
     try:
-        # Langsung ubah list data dari Swagger menjadi DataFrame pandas
-        df = pd.DataFrame(data)
+        # Mengubah matriks list JSON menjadi DataFrame pandas dengan 5 kolom fitur Binance
+        # Pastikan jumlah kolom pas dengan saat training (misal: open, high, low, close, volume)
+        df = pd.DataFrame(data, columns=["open", "high", "low", "close", "volume"])
         prediction = model.predict(df)
         return {"status": "success", "prediction": prediction.tolist()}
     except Exception as e:

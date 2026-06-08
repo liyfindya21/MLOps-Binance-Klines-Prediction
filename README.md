@@ -1125,6 +1125,20 @@ Pada tugas LK-10, metode serving diubah menggunakan server bawaan murni dari MLf
    Jika trafik atau beban server melonjak secara tiba-tiba, jumlah instansi kontainer API dapat ditingkatkan secara dinamis tanpa memicu downtime dengan mengeksekusi perintah:
    ```bash
    docker compose up -d --scale model-serving-api=3
+   ```
+## 🚨 Alerting & Continuous Training (CT) Pipeline Configuration
+
+Sistem ini dikonfigurasi menggunakan mekanisme **Closed-Loop Automation** yang menghubungkan Grafana Monitoring dengan GitHub Actions secara otomatis dari hulu ke hilir.
+
+### 📊 Ambang Batas Metrik (Thresholds)
+Untuk memicu proses *retraining* model secara otomatis tanpa intervensi manual, digunakan ambang batas metrik berikut:
+* **Metrik Evaluasi:** **F1-Score** (Model Binance Klines Prediction)
+* **Batas Threshold Minimum:** `0.45`
+
+### 🔄 Mekanisme Pemicu (Trigger Mechanism)
+1. **Performance Drop:** Jika dashboard monitoring Grafana mendeteksi performa model di production turun hingga menyentuh nilai **F1-Score < 0.45$**, Alert Rules akan otomatis berubah status menjadi `Firing`.
+2. **Webhook Dispatch:** Grafana secara mandiri mengirimkan payload HTTP POST Webhook (`repository_dispatch` dengan `event_type: model_decay_trigger`) menuju GitHub API repositori ini.
+3. **Automated Retraining:** Pipeline GitHub Actions langsung berjalan untuk melakukan penarikan data baru, mengeksekusi `train.py`, dan melakukan evaluasi komparatif model sebelum dipromosikan ke Production.
    
 ## 👤 11. Identitas Pengembang
 * 🏷️ **Nama:** Aurelia Salsabilla Yunanto P.

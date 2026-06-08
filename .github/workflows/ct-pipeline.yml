@@ -30,6 +30,7 @@ jobs:
     # Langkah 5: Mengeksekusi pelatihan ulang model BTC
     - name: Execute Model Retraining
       run: |
+        rm -f mlflow.db  # 👈 TAMBAHKAN BARIS INI (Menghapus DB lama yang bentrok)
         python src/train.py
 
     # Langkah 6: Menjalankan evaluasi komparatif otomatis pakai file aslimu

@@ -26,6 +26,7 @@ jobs:
     - name: Ingest Fresh Data From Binance API
       run: |
         python src/ingest_data.py  # 👈 GANTI LANGKAH DVC JADI INI (Biar dia bikin data/raw sendiri)
+        python src/preprocess.py
 
     - name: Execute Model Retraining
       run: |

@@ -1,9 +1,9 @@
 name: Continuous Training (CT) Pipeline - LK12
 
 on:
-  repository_dispatch:
+  workflow_dispatch: # 👈 Biar tombol manual di web tetep ada
+  repository_dispatch: # 👈 INI KUNCI SAKTI YANG HILANG BIAR WEBHOOK GRAFANA BISA MASUK!
     types: [model_decay_trigger]
-  workflow_dispatch: # Supaya bisa kita tes klik manual nanti
 
 jobs:
   retraining-process:
@@ -23,16 +23,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Pull Latest Data from DVC
+    - name: Ingest Fresh Data From Binance API
       run: |
-        dvc pull
+        python src/ingest_data.py  # 👈 GANTI LANGKAH DVC JADI INI (Biar dia bikin data/raw sendiri)
+        python src/preprocess.py
 
-    # Langkah 5: Mengeksekusi pelatihan ulang model BTC
     - name: Execute Model Retraining
       run: |
+        rm -f mlflow.db
         python src/train.py
 
-    # Langkah 6: Menjalankan evaluasi komparatif otomatis pakai file aslimu
     - name: Run Comparative Evaluation
       run: |
         python src/auto_eval_registry.py

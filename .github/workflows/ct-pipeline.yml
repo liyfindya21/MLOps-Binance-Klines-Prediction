@@ -1,0 +1,38 @@
+name: Continuous Training (CT) Pipeline - LK12
+
+on:
+  repository_dispatch:
+    types: [model_decay_trigger]
+  workflow_dispatch: # Supaya bisa kita tes klik manual nanti
+
+jobs:
+  retraining-process:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Pull Latest Data from DVC
+      run: |
+        dvc pull
+
+    # Langkah 5: Mengeksekusi pelatihan ulang model BTC
+    - name: Execute Model Retraining
+      run: |
+        python src/train.py
+
+    # Langkah 6: Menjalankan evaluasi komparatif otomatis pakai file aslimu
+    - name: Run Comparative Evaluation
+      run: |
+        python src/auto_eval_registry.py

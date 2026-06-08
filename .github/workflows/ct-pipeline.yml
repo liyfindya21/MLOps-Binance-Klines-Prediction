@@ -1,9 +1,9 @@
 name: Continuous Training (CT) Pipeline - LK12
 
 on:
-  repository_dispatch:
+  workflow_dispatch: # 👈 Biar tombol manual di web tetep ada
+  repository_dispatch: # 👈 INI KUNCI SAKTI YANG HILANG BIAR WEBHOOK GRAFANA BISA MASUK!
     types: [model_decay_trigger]
-  workflow_dispatch: # Supaya bisa kita tes klik manual nanti
 
 jobs:
   retraining-process:
